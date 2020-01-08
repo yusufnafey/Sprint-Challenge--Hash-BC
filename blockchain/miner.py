@@ -23,7 +23,7 @@ def proof_of_work(last_proof):
     start = timer()
 
     print("Searching for next proof")
-    proof = 0
+    proof = 1254123
     #  TODO: Your code here
     raw_hash = hashlib.sha256(f'{last_proof}'.encode())
     last_hash = raw_hash.hexdigest()
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         node = sys.argv[1]
     else:
-        node = "https://lambda-coin.herokuapp.com/api"
+        node = "https://lambda-treasure-hunt.herokuapp.com/api/bc"
 
     coins_mined = 0
 
@@ -72,14 +72,18 @@ if __name__ == '__main__':
     # Run forever until interrupted
     while True:
         # Get the last proof from the server
-        r = requests.get(url=node + "/last_proof")
+        headers = {
+            "content-type": "application/json",
+            "Authorization": f'Token f2896b279540a4d875dce2782970b0e0edefd257'
+        }
+        r = requests.get(url=node + "/last_proof", headers = headers)
         data = r.json()
         new_proof = proof_of_work(data.get('proof'))
 
         post_data = {"proof": new_proof,
                      "id": id}
 
-        r = requests.post(url=node + "/mine", json=post_data)
+        r = requests.post(url=node + "/mine", json=post_data, headers = headers)
         data = r.json()
         if data.get('message') == 'New Block Forged':
             coins_mined += 1
